@@ -68,8 +68,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const audio = document.getElementById('weddingMusic');
     const playIcon = playButton.querySelector('i');
     
+    // Пытаемся загрузить аудио
+    audio.load();
+    
     playButton.addEventListener('click', function() {
         if (audio.paused) {
+            // Пытаемся воспроизвести
             audio.play()
                 .then(() => {
                     playIcon.className = 'fas fa-pause';
@@ -77,7 +81,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
                 .catch(error => {
                     console.log("Автовоспроизведение заблокировано: ", error);
-                    alert("Пожалуйста, разрешите воспроизведение музыки в вашем браузере.");
+                    // Показываем более дружелюбное сообщение
+                    alert("Чтобы включить музыку, нажмите на кнопку еще раз и разрешите воспроизведение в браузере.");
                 });
         } else {
             audio.pause();
@@ -125,10 +130,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Названия дней недели
         const daysOfWeek = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
-        
-        // Названия месяцев
-        const monthNames = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 
-                           'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
         
         // Получаем первый день месяца и количество дней в месяце
         const firstDayOfMonth = new Date(2026, 7, 1);
@@ -180,46 +181,205 @@ document.addEventListener('DOMContentLoaded', function() {
     // Генерируем календарь
     generateCalendar();
     
-    // Обработка кнопки "Карта"
+    /// Обработка кнопки "Карта" с Яндекс.Картой
     const mapButton = document.getElementById('mapButton');
-    const mapPlaceholder = document.getElementById('mapPlaceholder');
+    const mapContainer = document.getElementById('mapContainer');
     let mapVisible = false;
-    
+
     mapButton.addEventListener('click', function() {
         if (!mapVisible) {
-            mapPlaceholder.style.display = 'flex';
+            mapContainer.style.display = 'block';
             mapButton.innerHTML = '<i class="fas fa-times"></i> Скрыть карту';
             mapVisible = true;
+            
+            // Плавный скролл к карте
+            setTimeout(() => {
+                mapContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
         } else {
-            mapPlaceholder.style.display = 'none';
+            mapContainer.style.display = 'none';
             mapButton.innerHTML = '<i class="fas fa-map-marker-alt"></i> Карта';
             mapVisible = false;
         }
     });
     
-    // Обработка формы
+    // Функция для показа уведомлений
+    function showNotification(message, type) {
+        // Удаляем существующее уведомление, если есть
+        const existingNotification = document.querySelector('.form-notification');
+        if (existingNotification) {
+            existingNotification.remove();
+        }
+        
+        // Создаем новое уведомление
+        const notification = document.createElement('div');
+        notification.className = `form-notification ${type}`;
+        notification.textContent = message;
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-family: 'Raleway', sans-serif;
+            font-size: 16px;
+            text-align: center;
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            animation: slideDown 0.3s ease;
+            max-width: 90%;
+            width: auto;
+            background-color: ${type === 'success' ? '#4CAF50' : '#f44336'};
+            color: white;
+            border: 2px solid ${type === 'success' ? '#45a049' : '#d32f2f'};
+        `;
+        
+        document.body.appendChild(notification);
+        
+        // Добавляем ключевые кадры для анимации, если их нет
+        if (!document.querySelector('#notification-keyframes')) {
+            const style = document.createElement('style');
+            style.id = 'notification-keyframes';
+            style.textContent = `
+                @keyframes slideDown {
+                    from {
+                        top: -100px;
+                        opacity: 0;
+                    }
+                    to {
+                        top: 20px;
+                        opacity: 1;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        // Скрываем уведомление через 5 секунд
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            notification.style.transition = 'opacity 0.3s ease';
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 300);
+        }, 5000);
+    }
+    
+    // Функция для преобразования значений алкоголя в русские названия
+    function getAlcoholText(alcoholValues) {
+        if (alcoholValues.length === 0) return 'Не выбрано';
+        
+        const alcoholMap = {
+            'sparkling': 'Игристое',
+            'white_wine': 'Белое вино',
+            'red_wine': 'Красное вино',
+            'whiskey': 'Виски',
+            'vodka': 'Водка',
+            'no_alcohol': 'Не буду пить алкоголь'
+        };
+        
+        const russianValues = alcoholValues.map(value => alcoholMap[value] || value);
+        return russianValues.join(', ');
+    }
+    
+    // Функция для экранирования специальных символов в телефоне
+    function escapePhoneNumber(phone) {
+        if (!phone) return '';
+        // Просто возвращаем телефон как строку, без специального форматирования
+        // Это предотвратит интерпретацию как формулы в Google Sheets
+        return phone;
+    }
+    
+    // Обработка формы с отправкой в Google Sheets
     const guestForm = document.getElementById('guestForm');
     
-    guestForm.addEventListener('submit', function(e) {
+    guestForm.addEventListener('submit', async function(e) {
         e.preventDefault();
+        
+        // Проверяем заполнение обязательных полей
+        const fio = this.querySelector('[name="fio"]').value.trim();
+        const phone = this.querySelector('[name="phone"]').value.trim();
+        const attendance = this.querySelector('[name="attendance"]:checked');
+        
+        if (!fio || !phone || !attendance) {
+            showNotification('Пожалуйста, заполните все обязательные поля!', 'error');
+            return;
+        }
+        
+        // Показываем сообщение о отправке
+        const submitButton = this.querySelector('.submit-button');
+        const originalText = submitButton.textContent;
+        submitButton.textContent = 'Отправка...';
+        submitButton.disabled = true;
         
         // Собираем данные формы
         const formData = new FormData(guestForm);
-        const data = {};
         
-        for (let [key, value] of formData.entries()) {
-            if (key === 'alcohol') {
-                if (!data[key]) data[key] = [];
-                data[key].push(value);
-            } else {
-                data[key] = value;
-            }
+        // Получаем ФИО
+        const name = formData.get('fio') || '';
+        
+        // Получаем телефон (просто как строку, без экранирования)
+        const phone_number = formData.get('phone') || '';
+        
+        // Получаем ответ о присутствии
+        const attendance_value = formData.get('attendance') || '';
+        const attendanceText = attendance_value === 'yes' ? 'С удовольствием приду' : 'Не смогу присутствовать';
+        
+        // Собираем выбранные напитки и преобразуем в русские названия
+        const alcoholValues = formData.getAll('alcohol');
+        const alcoholText = getAlcoholText(alcoholValues);
+        
+        // Получаем комментарии
+        const comments = formData.get('comments') || '';
+        
+        // Создаем объект с данными для отправки
+        const data = {
+            name: name,
+            phone: phone_number,
+            attendance: attendanceText,
+            alcohol: alcoholText,
+            comments: comments,
+            timestamp: new Date().toLocaleString('ru-RU')
+        };
+        
+        try {
+            // !!! ВАЖНО: Замените этот URL на ваш собственный из развернутого веб-приложения Google Apps Script !!!
+            const scriptURL = 'https://script.google.com/macros/s/AKfycbz9KN_ZkTb-I74a1IfxZM6Ab2lh2lC_zcsqAuZsomNv27NeLYwuAUc8ozfGTJzg_6GJ/exec';
+            
+            // Создаем FormData для отправки
+            const formBody = new URLSearchParams();
+            formBody.append('name', data.name);
+            formBody.append('phone', data.phone);
+            formBody.append('attendance', data.attendance);
+            formBody.append('alcohol', data.alcohol);
+            formBody.append('comments', data.comments);
+            
+            // Отправляем данные
+            const response = await fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors', // Важно для работы с Google Apps Script
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: formBody
+            });
+            
+            // Из-за mode: 'no-cors' мы не можем прочитать ответ
+            // Но если ошибки не было, считаем что все хорошо
+            showNotification('Спасибо! Ваш ответ отправлен. Мы с нетерпением ждем вас на свадьбе! ❤️', 'success');
+            guestForm.reset();
+            
+        } catch (error) {
+            console.error('Ошибка при отправке:', error);
+            showNotification('Произошла ошибка при отправке. Пожалуйста, попробуйте еще раз или свяжитесь с нами по телефону.', 'error');
+        } finally {
+            // Возвращаем кнопку в исходное состояние
+            submitButton.textContent = originalText;
+            submitButton.disabled = false;
         }
-        
-        // В реальном проекте здесь будет отправка на сервер
-        // Для демо просто показываем сообщение
-        alert('Спасибо! Ваш ответ сохранен. Мы с нетерпением ждем встречи с вами на нашей свадьбе!');
-        guestForm.reset();
     });
     
     // Плавная прокрутка при клике на ссылки
@@ -238,13 +398,60 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // Добавляем обработчик для кнопки Telegram (если она есть)
+    const telegramButton = document.querySelector('.telegram-button');
+    if (telegramButton) {
+        telegramButton.addEventListener('click', function(e) {
+            // Можно добавить аналитику или дополнительную логику
+            console.log('Переход в Telegram чат');
+        });
+    }
+
+    // Добавляем валидацию телефона в реальном времени
+    const phoneInput = document.querySelector('input[name="phone"]');
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function(e) {
+            let value = this.value.replace(/\D/g, '');
+            if (value.length > 0) {
+                if (value.length <= 1) {
+                    value = '+7 (' + value;
+                } else if (value.length <= 4) {
+                    value = '+7 (' + value.substring(1, 4);
+                } else if (value.length <= 7) {
+                    value = '+7 (' + value.substring(1, 4) + ') ' + value.substring(4, 7);
+                } else if (value.length <= 9) {
+                    value = '+7 (' + value.substring(1, 4) + ') ' + value.substring(4, 7) + '-' + value.substring(7, 9);
+                } else {
+                    value = '+7 (' + value.substring(1, 4) + ') ' + value.substring(4, 7) + '-' + value.substring(7, 9) + '-' + value.substring(9, 11);
+                }
+                this.value = value;
+            }
+        });
+    }
 });
 
 // Функция для скролла к основному контенту
 function scrollToContent() {
     const content = document.querySelector('.content');
-    window.scrollTo({
-        top: content.offsetTop - 60,
-        behavior: 'smooth'
-    });
+    if (content) {
+        window.scrollTo({
+            top: content.offsetTop - 60,
+            behavior: 'smooth'
+        });
+    }
 }
+
+// Добавляем обработку ошибок для изображений
+document.addEventListener('DOMContentLoaded', function() {
+    const images = document.querySelectorAll('img');
+    images.forEach(img => {
+        img.addEventListener('error', function() {
+            console.log('Ошибка загрузки изображения:', this.src);
+            // Можно добавить заглушку для отсутствующих изображений
+            if (!this.src.includes('placeholder')) {
+                // this.src = 'placeholder.jpg'; // если есть заглушка
+            }
+        });
+    });
+});
