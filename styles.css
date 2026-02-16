@@ -1475,3 +1475,30 @@ body::before {
     object-fit: cover;
     max-height: 400px; /* Ограничьте высоту по необходимости */
 }
+
+
+/* Убираем нижние отступы у content */
+.content {
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+/* Убираем отступы у последней секции */
+.footer-section {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+/* Прижимаем изображение кверху */
+.footer-image-container {
+    margin-top: -5px !important; /* Подберите значение */
+    padding-top: 0 !important;
+    position: relative;
+    top: -1px;
+}
+
+.footer-image-container img {
+    display: block;
+    margin: 0;
+    padding: 0;
+}
