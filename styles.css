@@ -1,1234 +1,858 @@
-/* Сброс отступов и настройка на весь экран */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
 }
 
-
- 
-html, body {
-    width: 100%;
-    min-height: 100vh;
-    background-color: black; /* Фон на случай, если фото не загрузятся */
+html {
+    scroll-behavior: smooth;
 }
 
-/* Галерея занимает всю ширину */
-.gallery {
-    display: flex;
-    flex-direction: column; /* Шесть фото вертикально (одно под другим) */
-    width: 100%;
-    min-height: 100vh;
-    gap: 0;
-}
-
-.photo-container img[src$=".PNG"],
-.photo-container img[src$=".png"] {
-    background-color: transparent; /* или другой цвет по желанию */
-}
-
-
-
-
-/* Контейнер для каждого фото */
-.photo-container {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    
-}
-
-/* Сами фотографии */
-.photo {
-    display: block;
-    width: 100%;        /* Растягиваем на всю ширину экрана */
-    height: auto;       /* Высота сохраняет пропорции */
-    object-fit: contain; /* Вписываем без обрезки */
-    background-color: #111; /* Фон для фото с прозрачностью (PNG) */
-}
-
-/* Контейнер для пятого фото с таймером */
-.timer-container {
+body {
+    font-family: 'Playfair Display', serif;
+    background-color: #fff;
+    color: #333;
+    line-height: 1.6;
+    overflow-x: hidden;
     position: relative;
+    min-height: 100vh;
+}
+
+/* Фоновое статичное фото - НА ВЕСЬ ЭКРАН БЕЗ ЭФФЕКТОВ */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
     width: 100%;
-}
-
-/* Таймер поверх фото */
-.timer-overlay {
-    position: absolute;
-    top: 64%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: #3c373b;
-    font-size: 8vw;           /* Немного уменьшил, чтобы поместились подписи */
-    font-weight: 100;          /* Толщина 100 (самое тонкое, что есть) */
-    font-family: 'Didot', 'Bodoni', 'Georgia', 'Times New Roman', serif;
-    z-index: 10;
-    pointer-events: none;
-    background: transparent;
-    text-align: center;
-    text-shadow: none;
-    -webkit-font-smoothing: antialiased; /* Максимальное сглаживание */
-    -moz-osx-font-smoothing: grayscale;
-    opacity: 0.7;
-    display: flex;
-    gap: 8vw;
-    flex-wrap: wrap;
-    justify-content: center;
-    width: 90%;
-    max-width: 1200px;
-}
-
-.time-unit {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 80px; /* Увеличена минимальная ширина */
-    padding: 0 2vw;  /* Добавлены внутренние отступы по бокам */
-}
-
-/* Стиль для цифр */
-.time-number {
-    font-size: 1em;
-    line-height: 1.2;
-    font-weight: 100;
-    color: #3c373b;
-}
-
-/* Стиль для подписи (д, ч, м, с) */
-.time-label {
-    font-size: 0.35em;        /* Маленький текст под цифрами */
-    letter-spacing: 0.2em;     /* Разреженные буквы */
-    text-transform: lowercase;
-    margin-top: 0.3em;
-    opacity: 0.8;
-    font-weight: 100;
-    color: #3c373b;
-}
-
-/* Адаптация для очень маленьких экранов */
-@media (max-width: 400px) {
-    .timer-overlay {
-        font-size: 10vw;
-        gap: 1vw;
-    }
-    
-    .time-unit {
-        min-width: 40px;
-    }
-}
-
-/* Стили для секции ЛОКАЦИЯ */
-.location-section {
-    width: 100%;
-    background-color: white;
-    padding: 50px 25px 70px; /* Увеличен нижний отступ для кнопки */
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    box-sizing: border-box;
-    font-family: 'Didot', 'Bodoni', 'Georgia', 'Times New Roman', serif;
-}
-
-/* Контейнер для фото-заголовка */
-.location-title-photo {
-    width: 100%;
-    text-align: center;
-    margin-bottom: 35px;
-}
-
-/* Само фото заголовка */
-.location-title-img {
-    max-width: 80%;
-    height: auto;
-    display: inline-block;
-}
-
-.location-address {
-    font-size: 24px;
-    font-weight: 250;
-    line-height: 1.5;
-    margin-bottom: 15px;
-    color: #3c373b;
-    text-align: left;
-}
-
-.location-time {
-    font-size: 22px;
-    font-weight: 200;
-    color: #3c373b;
-    opacity: 0.6;
-    margin-bottom: 35px;
-    text-align: left;
-}
-
-/* Контейнер для фото с кнопкой */
-.location-photo-wrapper {
-    position: relative;
-    width: 100%;
-    margin-top: 10px;
-    margin-bottom: 20px;
-}
-
-.location-photo {
-    width: 100%;
-    height: auto;
-    display: block;
-    background-color: white;
-}
-
-/* Кнопка-круг "как добраться" */
-.location-button {
-    position: absolute;
-    bottom: -45px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 110px;
-    height: 110px;
-    background-color: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: flex-start; /* Текст прижимается к верху */
-    justify-content: center;
-    text-align: center;
-    color: #3c373b;
-    font-family: 'Didot', 'Bodoni', 'Georgia', 'Times New Roman', serif;
-    font-size: 16px;
-    font-weight: 400;
-    letter-spacing: 1px;
-    text-transform: lowercase;
-    text-decoration: none;
-    cursor: pointer;
-    border: 2px solid #3c373b;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
-    z-index: 20;
-    transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
-    line-height: 1.3;
-    padding: 10px 10px 0; /* Увеличин верхний отступ для поднятия текста */
-    
-}
-
-/* Эффект при нажатии/наведении */
-.location-button:hover,
-.location-button:active {
-    transform: translateX(-50%) scale(1.05);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-    background-color: #f8f8f8;
-}
-
-/* Текст в две строки */
-.location-button span {
-    display: block;
-    align-items: flex-start; /* Текст прижимается к верху */
-    padding-top: 12px; /* Увеличить отступ сверху */
-}
-
-/* Стили для секции ТАЙМИНГ */
-.timing-section {
-    width: 100%;
-    background-image: url('44.jpg');
+    height: 100%;
+    background-image: url('1.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    padding: 60px 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-    font-family: 'Didot', 'Bodoni', 'Georgia', 'Times New Roman', serif;
-    position: relative;
+    background-attachment: fixed;
+    opacity: 1;
+    z-index: -1;
 }
 
-/* Затемнение фона для лучшей читаемости текста */
-.timing-section::before {
+/* Контейнер */
+.container {
+    max-width: 100%;
+    padding: 0;
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+}
+
+/* Верхняя секция с фото и текстом */
+.top-section {
+    height: 100vh;
+    position: relative;
+    padding: 15px;
+    overflow: hidden;
+}
+
+/* Дата свадьбы в правом верхнем углу - УВЕЛИЧЕНА */
+.wedding-date {
+    position: absolute;
+    top: 30px;
+    right: 40px !important;
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    color: #8B0000;
+    font-size: 85px;
+    line-height: 0.85;
+    font-weight: 700;
+    z-index: 100;
+    text-shadow: 2px 2px 4px rgba(255, 255, 255, 0.8);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.wedding-date div {
+    margin: 2px 0;
+    height: 75px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Рамка Polaroid для фото */
+.polaroid-frame {
+    position: absolute;
+    background: white;
+    padding: 12px 12px 40px 12px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+    border-radius: 2px;
+    z-index: 10;
+}
+
+.polaroid-frame::after {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
+    width: 100%;
+    height: 30px;
+    background: white;
     bottom: 0;
-    background-color: rgba(255, 255, 255, 0); /* Белое полупрозрачное затемнение */
-    z-index: 1;
+    left: 0;
+    border-radius: 0 0 2px 2px;
 }
 
-/* Чтобы контент был поверх затемнения */
-.timing-section > * {
+/* Фото невесты в левом верхнем углу - ВЕРНУЛИ ПРЕЖНИЙ РАЗМЕР */
+.bride-photo-container {
+    top: 20px;
+    left: 15px;
+    width: 55% !important; /* Оригинальный размер */
+    max-width: 250px !important; /* Оригинальный размер */
+    transform: rotate(-5deg);
+    animation: gentleSwingRight 8s infinite ease-in-out;
+}
+
+/* Фото жениха в правом нижнем углу - ВЕРНУЛИ ПРЕЖНИЙ РАЗМЕР */
+.groom-photo-container {
+    bottom: 30px;
+    right: 15px;
+    width: 55% !important; /* Оригинальный размер */
+    max-width: 250px !important; /* Оригинальный размер */
+    transform: rotate(4deg);
+    animation: gentleSwingLeft 8s infinite ease-in-out;
+    animation-delay: 0.5s;
+}
+
+.groom-photo {
+    width: 100%;
+    height: auto;
+    display: block;
+    aspect-ratio: 3/4;
+    object-fit: cover;
+    object-position: center 10%; /* Сдвиг фото ниже (60% от верхнего края) */
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Декоративное фото с узорами (без рамки) - ОСТАВИЛИ ТАКИМ ЖЕ */
+.decoration-photo-container {
+    position: absolute;
+    bottom: 120px;
+    left: 15px; /* Немного вправо */
+    width: 200px !important; /* Оригинальный размер */
+    height: 200px !important; /* Оригинальный размер */
+    z-index: 9;
+    animation: gentleFloat 10s infinite ease-in-out;
+}
+
+.decoration-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Общие стили для декоративных элементов */
+.decor-element {
+    position: absolute;
+    object-fit: contain;
+    z-index: 5;
+    animation: gentleFloat 12s infinite ease-in-out;
+}
+
+/* Элемент 12.png справа от кнопки музыки - УВЕЛИЧЕН И СДВИНУТ ПРАВЕЕ */
+.music-decor {
+    right: 10% !important; /* Сдвинуто правее */
+    top: 50%;
+    width: 160px !important; /* Увеличен */
+    height: 160px !important; /* Увеличен */
+    transform: translateY(-50%);
+}
+
+/* Элемент 13.png слева от календаря - УВЕЛИЧЕН И СДВИНУТ ВЫШЕ */
+.calendar-decor {
+    left: 5%;
+    top: -50px !important; /* Сдвинуто выше */
+    width: 160px !important; /* Увеличен */
+    height: 160px !important; /* Увеличен */
+}
+
+/* Элемент 11.png справа от "дресс-код" - УВЕЛИЧЕН И СДВИНУТ ПРАВЕЕ */
+.dresscode-decor {
+    right: 10% !important; /* Сдвинуто правее */
+    top: -40px; /* Сдвинуто выше */
+    width: 160px !important; /* Увеличен */
+    height: 160px !important; /* Увеличен */
+}
+
+/* Элемент 14.png справа от Welcome - УВЕЛИЧЕН И СДВИНУТ ВЫШЕ */
+.welcome-decor {
+    right: 5%;
+    top: -45px !important; /* Сдвинуто выше */
+    width: 140px !important; /* Увеличен */
+    height: 140px !important; /* Увеличен */
+}
+
+/* Элемент 12.png слева от "банкет" - УВЕЛИЧЕН, СДВИНУТ ПРАВЕЕ И ВЫШЕ */
+.banket-decor {
+    left: 10% !important; /* Сдвинуто правее */
+    top: -50px !important; /* Сдвинуто выше */
+    width: 160px !important; /* Увеличен */
+    height: 160px !important; /* Увеличен */
+}
+
+/* Элемент 13.png справа от завершения праздника - УВЕЛИЧЕН, СДВИНУТ ПРАВЕЕ И НИЖЕ */
+.finish-decor {
+    right: 10% !important; /* Сдвинуто правее */
+    bottom: -50px !important; /* Сдвинуто ниже */
+    width: 150px !important; /* Увеличен */
+    height: 150px !important; /* Увеличен */
+}
+
+/* Элемент 15.png в пожеланиях - УВЕЛИЧЕН */
+.wishes-decor {
+    display: block;
+    margin: 25px auto;
+    width: 180px !important; /* Увеличен */
+    height: 180px !important; /* Увеличен */
+    animation: gentleFloat 10s infinite ease-in-out;
+}
+
+/* Второй элемент 15.png в пожеланиях - УВЕЛИЧЕН */
+.second-wishes-decor {
+    margin: 25px auto;
+    width: 180px !important; /* Увеличен */
+    height: 180px !important; /* Увеличен */
+}
+
+/* Элемент 16.png перед подписью - УВЕЛИЧЕН */
+.signature-decor {
+    display: block;
+    margin: 0 auto 25px;
+    width: 160px !important; /* Увеличен */
+    height: 160px !important; /* Увеличен */
+    animation: gentleFloat 8s infinite ease-in-out;
+}
+
+/* Подпись внизу */
+.signature-text {
+    font-family: 'Bad Script', cursive;
+    font-size: 36px;
+    color: #8B0000;
+    text-align: center;
+    margin: 30px 0 50px;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+    padding: 0 10px;
+}
+
+@keyframes gentleFloat {
+    0%, 100% { 
+        transform: translateY(0) rotate(0deg); 
+    }
+    25% { 
+        transform: translateY(-10px) rotate(5deg); 
+    }
+    75% { 
+        transform: translateY(5px) rotate(-5deg); 
+    }
+}
+
+.bride-photo, .groom-photo {
+    width: 100%;
+    height: auto;
+    display: block;
+    aspect-ratio: 3/4;
+    object-fit: cover;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Подпись под фото Polaroid */
+.photo-caption {
+    position: absolute;
+    bottom: 12px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    color: #000000;
+    z-index: 11;
+    padding: 0 10px;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+.bride-caption {
+    transform: rotate(0);
+}
+
+.groom-caption {
+    transform: rotate(1deg);
+}
+
+@keyframes gentleSwingRight {
+    0%, 100% { transform: rotate(-5deg); }
+    25% { transform: rotate(-8deg); }
+    75% { transform: rotate(-2deg); }
+}
+
+@keyframes gentleSwingLeft {
+    0%, 100% { transform: rotate(4deg); }
+    25% { transform: rotate(7deg); }
+    75% { transform: rotate(1deg); }
+}
+
+/* Текст в центре экрана - СДЕЛАН ТОНЬШЕ */
+.center-text-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    width: 90%;
+    z-index: 5;
+}
+
+.typing-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    color: #000000;
+    display: inline-block;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.7);
+    font-weight: 300;
+    margin-bottom: 10px;
+    letter-spacing: 0.5px;
+}
+
+.heart {
+    color: #000000;
+    display: inline-block;
+    animation: heartbeat 1.5s infinite;
+    opacity: 0;
+}
+
+@keyframes heartbeat {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.2); opacity: 1; }
+}
+
+.cursor {
+    display: inline-block;
+    width: 3px;
+    height: 30px;
+    background-color: #000000;
+    margin-left: 8px;
+    animation: blink 1s infinite;
+    vertical-align: middle;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+/* Стрелка для скролла вниз */
+.scroll-down {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    color: #8B0000;
+    font-size: 24px;
+    animation: bounce 2s infinite;
+    cursor: pointer;
+    z-index: 10;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+    40% { transform: translateX(-50%) translateY(-10px); }
+    60% { transform: translateX(-50%) translateY(-5px); }
+}
+
+/* ОСНОВНОЙ КОНТЕНТ БЕЗ БЕЛОГО ФОНА */
+.content {
+    padding: 40px 20px 80px;
     position: relative;
     z-index: 2;
+    background: transparent;
+    margin-top: 0;
+    border-radius: 0;
 }
 
-.timing-title {
+/* ОБЩИЙ СТИЛЬ ДЛЯ ЗАГОЛОВКОВ */
+.main-title {
+    font-family: 'Bad Script', cursive;
     font-size: 42px;
-    font-weight: 300;
-    letter-spacing: 6px;
-    margin-bottom: 50px;
-    color: #3c373b;
+    color: #8B0000;
     text-align: center;
-    text-transform: uppercase;
-    width: 100%;
-}
-
-.timing-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 40px;
-    width: 100%;
-    max-width: 400px;
-}
-
-.timing-item:last-child {
-    margin-bottom: 0;
-}
-
-.timing-icon {
-    width: 120px;
-    height: 120px;
-    object-fit: contain;
-    margin-bottom: 15px;
-    background-color: transparent;
-}
-
-.timing-text {
-    font-size: 24px;
-    font-weight: 250;
-    color: #3c373b;
-    text-align: center;
+    margin: 50px 0 30px;
+    text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.9);
+    padding: 0 10px;
+    font-weight: 400;
     letter-spacing: 1px;
+    position: relative;
 }
 
-/* Адаптация для маленьких экранов */
-@media (max-width: 600px) {
-    .location-section {
-        padding: 40px 20px 65px;
-    }
-    
-    .location-title-photo {
-        margin-bottom: 30px;
-    }
-    
-    .location-address {
-        font-size: 20px;
-    }
-    
-    .location-time {
-        font-size: 18px;
-        margin-bottom: 30px;
-    }
-    
-    .location-button {
-        width: 100px;
-        height: 100px;
-        font-size: 15px;
-        bottom: -40px;
-        padding: 12px 8px 0;
-    }
-    
-    /* Тайминг секция адаптация */
-    .timing-section {
-        padding: 40px 15px;
-    }
-    
-    .timing-title {
-        font-size: 36px;
-        letter-spacing: 4px;
-        margin-bottom: 40px;
-    }
-    
-    .timing-icon {
-        width: 100px;
-        height: 100px;
-    }
-    
-    .timing-text {
-        font-size: 20px;
-    }
-    
-    .timing-item {
-        margin-bottom: 35px;
-    }
+/* Заголовок "Дорогие и любимые!" */
+.handwritten-title {
+    font-family: 'Bad Script', cursive;
+    font-size: 46px;
+    color: #8B0000;
+    text-align: center;
+    margin: 50px 0 40px;
+    text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.9);
+    padding: 0 10px;
+    font-weight: 400;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    overflow: hidden;
 }
 
-@media (max-width: 400px) {
-    .location-section {
-        padding: 30px 15px 55px;
-    }
-    
-    .location-button {
-        width: 90px;
-        height: 90px;
-        font-size: 13px;
-        bottom: -35px;
-        padding: 10px 5px 0;
-    }
-    
-    /* Тайминг секция адаптация */
-    .timing-section {
-        padding: 30px 10px;
-    }
-    
-    .timing-title {
-        font-size: 30px;
-        letter-spacing: 3px;
-        margin-bottom: 30px;
-    }
-    
-    .timing-icon {
-        width: 80px;
-        height: 80px;
-    }
-    
-    .timing-text {
-        font-size: 18px;
-    }
-    
-    .timing-item {
-        margin-bottom: 30px;
-    }
+/* Музыкальный плеер - ТОЛЬКО КНОПКА */
+.music-section {
+    text-align: center;
+    margin: 30px 0;
+    padding: 0 15px;
+    position: relative;
 }
 
-@media (max-width: 320px) {
-    .location-button {
-        width: 80px;
-        height: 80px;
-        font-size: 12px;
-        bottom: -30px;
-        padding: 8px 5px 0;
-    }
-}
-
-/* Стили для секции ПОЖЕЛАНИЯ */
-.wishes-section {
-    width: 100%;
-    background-color: #ffffff; /* Белый фон */
-    padding: 60px 20px;
+.music-player {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-    font-family: 'Didot', 'Bodoni', 'Georgia', 'Times New Roman', serif;
-}
-
-.wishes-title {
-    font-size: 42px;
-    font-weight: 300;
-    letter-spacing: 6px;
-    margin-bottom: 40px;
-    color: #3c373b;
-    text-align: center;
-    text-transform: uppercase;
-    width: 100%;
-}
-
-.wishes-slider {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    max-width: 800px;
     gap: 10px;
     position: relative;
 }
 
-.wish-container {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
+.player-wrapper {
+    position: relative;
+    display: inline-flex;
     align-items: center;
-    text-align: center;
-    padding: 0 5px;
+    justify-content: center;
 }
 
-.wish-text {
+.play-button {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background: #666666;
+    border: none;
+    color: white;
+    font-size: 28px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    z-index: 2;
+}
+
+.play-button:hover {
+    transform: scale(1.05);
+    background: #777777;
+}
+
+.circle-text {
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    animation: rotateText 20s linear infinite;
+    font-family: 'Roboto', sans-serif;
+    font-size: 12px;
+    fill: #000000;
+    font-weight: normal;
+}
+
+@keyframes rotateText {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Текст приглашения */
+.invitation-text {
+    font-family: 'Raleway', sans-serif;
     font-size: 22px;
-    font-weight: 250;
-    line-height: 1.6;
-    color: #3c373b;
+    color: #000000;
+    text-align: center;
+    margin: 40px 20px 50px;
+    line-height: 1.8;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.invitation-text p {
     margin-bottom: 25px;
-    min-height: 140px;
-    display: flex;
-    align-items: center;
-    transition: opacity 0.3s ease;
 }
 
-.wish-counter {
-    font-size: 18px;
-    font-weight: 200;
-    color: #3c373b;
-    opacity: 0.7;
-    letter-spacing: 1px;
+.invitation-text p:last-child {
+    margin-bottom: 0;
 }
 
-.wish-arrow {
-    background: none;
-    border: none; /* Убираем обводку */
-    color: #3c373b;
-    width: auto; /* Убираем фиксированную ширину */
-    height: auto; /* Убираем фиксированную высоту */
-    font-size: 48px; /* Увеличиваем размер стрелок */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    flex-shrink: 0;
-    line-height: 1;
-    padding: 10px 15px; /* Добавляем область для нажатия */
-    opacity: 0.7;
-}
-
-.wish-arrow:hover {
-    opacity: 1;
-    transform: scale(1.2);
-}
-
-.wish-arrow:active {
-    transform: scale(0.95);
-}
-
-.wish-arrow:disabled {
-    opacity: 0.2;
-    cursor: not-allowed;
-    pointer-events: none;
-}
-
-/* Адаптация для маленьких экранов */
-@media (max-width: 600px) {
-    .wishes-section {
-        padding: 40px 15px;
-    }
-    
-    .wishes-title {
-        font-size: 36px;
-        letter-spacing: 4px;
-        margin-bottom: 30px;
-    }
-    
-    .wish-text {
-        font-size: 18px;
-        min-height: 160px;
-    }
-    
-    .wish-arrow {
-        font-size: 42px;
-        padding: 8px 12px;
-    }
-    
-    .wishes-slider {
-        gap: 5px;
-    }
-}
-
-@media (max-width: 400px) {
-    .wishes-section {
-        padding: 30px 10px;
-    }
-    
-    .wishes-title {
-        font-size: 30px;
-        letter-spacing: 3px;
-        margin-bottom: 25px;
-    }
-    
-    .wish-text {
-        font-size: 16px;
-        min-height: 180px;
-        margin-bottom: 20px;
-    }
-    
-    .wish-arrow {
-        font-size: 36px;
-        padding: 5px 10px;
-    }
-    
-    .wish-counter {
-        font-size: 16px;
-    }
-}
-
-@media (max-width: 320px) {
-    .wish-text {
-        font-size: 15px;
-        min-height: 200px;
-    }
-    
-    .wish-arrow {
-        font-size: 32px;
-        padding: 5px 8px;
-    }
-}
-
-/* Стили для кнопки списка подарков */
-.gift-button {
-    display: block;
-    width: 90%;
-    max-width: 600px;
-    margin: 50px auto 20px;
-    padding: 25px 30px;
-    background-color: #ffffff;
-    border: 2px solid #3c373b;
-    border-radius: 100px; /* Овальная форма */
-    color: #3c373b;
-    font-family: 'Didot', 'Bodoni', 'Georgia', 'Times New Roman', serif;
-    font-size: 24px;
-    font-weight: 300;
-    letter-spacing: 4px;
-    text-transform: uppercase;
+/* КАЛЕНДАРЬ - УЛУЧШЕННАЯ ВЕРСИЯ */
+.calendar-section {
     text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
-
-.gift-button:hover,
-.gift-button:active {
-    background-color: #3c373b;
-    color: #ffffff;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(60, 55, 59, 0.3);
-}
-
-/* Стили для модального окна */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    z-index: 1000;
-    overflow-y: auto;
-    backdrop-filter: blur(5px);
-}
-
-.modal.show {
-    display: block;
-}
-
-.modal-content {
+    margin: 50px 20px;
+    padding: 0;
     position: relative;
-    background-color: #ffffff;
-    margin: 30px auto;
-    padding: 0;
-    width: 90%;
-    max-width: 700px;
-    border-radius: 30px;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
-    animation: modalSlideIn 0.4s ease;
 }
 
-@keyframes modalSlideIn {
-    from {
-        transform: translateY(-50px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 25px 30px;
-    border-bottom: 1px solid #e0e0e0;
-}
-
-.modal-title {
-    font-family: 'Didot', 'Bodoni', 'Georgia', 'Times New Roman', serif;
-    font-size: 28px;
-    font-weight: 300;
-    letter-spacing: 4px;
-    color: #3c373b;
-    margin: 0;
-}
-
-.modal-close {
-    background: none;
-    border: none;
-    font-size: 40px;
-    line-height: 1;
-    color: #3c373b;
-    cursor: pointer;
-    padding: 0;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-}
-
-.modal-close:hover {
-    transform: scale(1.2);
-    color: #000;
-}
-
-.modal-body {
-    padding: 30px;
-    max-height: 60vh;
-    overflow-y: auto;
-}
-
-/* Упрощенные стили для списка подарков (без категорий) */
-.gift-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.gift-item {
-    padding: 18px 0;
-    border-bottom: 1px solid #f0f0f0;
-    font-family: 'Didot', 'Bodoni', 'Georgia', 'Times New Roman', serif;
-    font-size: 20px;
-    font-weight: 250;
-    color: #3c373b;
-    text-align: left;
-    line-height: 1.4;
-}
-
-.gift-item:last-child {
-    border-bottom: none;
-}
-
-/* Адаптация для мобильных устройств */
-@media (max-width: 600px) {
-    .gift-button {
-        width: 95%;
-        padding: 30px 40px;
-        font-size: 20px;
-        letter-spacing: 3px;
-        margin: 40px auto 15px;
-        border-radius: 100px !important;
-    }
-    
-    .modal-content {
-        margin: 15px auto;
-        width: 95%;
-    }
-    
-    .modal-header {
-        padding: 20px 25px;
-    }
-    
-    .modal-title {
-        font-size: 24px;
-        letter-spacing: 3px;
-    }
-    
-    .modal-close {
-        font-size: 36px;
-    }
-    
-    .modal-body {
-        padding: 20px;
-    }
-    
-    .gift-item {
-        padding: 15px 0;
-        font-size: 18px;
-    }
-}
-
-@media (max-width: 400px) {
-    .gift-button {
-        padding: 18px 20px;
-        font-size: 18px;
-        letter-spacing: 2px;
-    }
-    
-    .modal-title {
-        font-size: 20px;
-        letter-spacing: 2px;
-    }
-    
-    .gift-item {
-        padding: 12px 0;
-        font-size: 16px;
-    }
-}
-
-/* Стили для секции КОНТАКТЫ */
-.contacts-section {
-    width: 100%;
-    background-color: #ffffff;
-    padding: 60px 20px 70px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-    font-family: 'Didot', 'Bodoni', 'Georgia', 'Times New Roman', serif;
-}
-
-.contacts-title {
-    font-size: 42px;
-    font-weight: 300;
-    letter-spacing: 6px;
-    margin-bottom: 30px;
-    color: #3c373b;
-    text-align: center;
-    text-transform: uppercase;
-    width: 100%;
-}
-
-.contacts-description {
-    font-size: 18px;
-    font-weight: 250;
-    line-height: 1.5;
-    color: #3c373b;
-    text-align: center;
-    margin-bottom: 40px;
-    max-width: 500px;
-    opacity: 0.8;
-}
-
-.contacts-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-    max-width: 600px;
-    margin-bottom: 20px;
-    background-color: #f9f9f9;
-    padding: 20px 25px;
-    border-radius: 20px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-}
-
-.contact-info {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-}
-
-.contact-name {
-    font-size: 28px;
-    font-weight: 300;
-    color: #3c373b;
-    margin-bottom: 8px;
-    line-height: 1.2;
-}
-
-.contact-phone {
-    font-size: 22px;
-    font-weight: 250;
-    color: #3c373b;
-    text-decoration: none;
-    opacity: 0.8;
-    transition: opacity 0.2s;
+.calendar-frame {
     display: inline-block;
-}
-
-.contact-phone:hover {
-    opacity: 1;
-}
-
-.contact-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 140px;
-    height: 140px;
-    background-color: #ffffff;
-    border: 2px solid #3c373b;
-    border-radius: 50%;
-    color: #3c373b;
-    font-family: 'Didot', 'Bodoni', 'Georgia', 'Times New Roman', serif;
-    font-size: 11px !important;
-    font-weight: 400;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    text-decoration: none;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    line-height: 1.2; /* Уменьшена для лучшего контроля */
-    flex-shrink: 0;
-    margin-left: 15px;
-    /* Добавленные свойства для точного центрирования */
-    padding: 0; /* Убираем все внутренние отступы */
-    box-sizing: border-box;
-    text-indent: 0; /* Убираем отступ текста */
-    word-break: break-word; /* Перенос слов при необходимости */
-}
-
-
-.contact-button:hover,
-.contact-button:active {
-    background-color: #3c373b;
-    color: #ffffff;
-    transform: scale(1.05);
-    box-shadow: 0 8px 25px rgba(60, 55, 59, 0.2);
-}
-
-
-.contact-button span {
-    display: block;
-    max-width: 100px; /* Ограничиваем ширину текста */
-    margin: 0 auto; /* Центрируем блок с текстом */
-    transform: translateX(0); /* Сброс возможных трансформаций */
-}
-
-/* Адаптация для мобильных устройств */
-@media (max-width: 600px) {
-    .contacts-section {
-        padding: 50px 15px 60px;
-    }
-    
-    .contacts-title {
-        font-size: 36px;
-        letter-spacing: 4px;
-        margin-bottom: 25px;
-    }
-    
-    .contacts-description {
-        font-size: 16px;
-        margin-bottom: 30px;
-        padding: 0 10px;
-    }
-    
-    .contacts-wrapper {
-        padding: 15px 20px;
-    }
-    
-    .contact-name {
-        font-size: 24px;
-    }
-    
-    .contact-phone {
-        font-size: 18px;
-    }
-    
-    .contact-button {
-        width: 120px;
-        height: 120px;
-        font-size: 16px;
-        letter-spacing: 1.5px;
-    }
-
-    .contact-button span {
-        max-width: 90px;
-    }
-}
-
-@media (max-width: 400px) {
-    .contacts-section {
-        padding: 40px 12px 50px;
-    }
-    
-    .contacts-title {
-        font-size: 30px;
-        letter-spacing: 3px;
-        margin-bottom: 20px;
-    }
-    
-    .contacts-description {
-        font-size: 15px;
-        margin-bottom: 25px;
-    }
-    
-    .contacts-wrapper {
-        padding: 12px 15px;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-    
-    .contact-info {
-        width: 100%;
-        text-align: center;
-        margin-bottom: 15px;
-    }
-    
-    .contact-name {
-        font-size: 24px;
-    }
-    
-    .contact-phone {
-        font-size: 18px;
-    }
-    
-    .contact-button {
-        width: 110px;
-        height: 110px;
-        font-size: 16px;
-    }
-
-    .contact-button span {
-        max-width: 80px;
-    }
-}
-
-@media (max-width: 320px) {
-    .contact-button {
-        width: 100px;
-        height: 100px;
-        font-size: 15px;
-    }
-    
-    .contact-button span {
-        max-width: 75px;
-    }
-}
-
-/* Стили для секции АНКЕТА ГОСТЯ */
-.guest-section {
-    width: 100%;
-    background-color: #ffffff;
-    padding: 60px 20px 80px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-    font-family: 'Didot', 'Bodoni', 'Georgia', 'Times New Roman', serif;
-
-    background-image: url('44.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    background: #f8f8f8;
+    padding: 18px 18px 42px 18px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+    border-radius: 2px;
     position: relative;
+    animation: gentleSwingCalendar 7s infinite ease-in-out;
+    width: 320px;
+    height: 320px;
+    max-width: 90%;
+    max-height: 320px;
+    overflow: hidden;
 }
 
-.guest-title {
-    font-size: 42px;
-    font-weight: 300;
-    letter-spacing: 6px;
-    margin-bottom: 30px;
-    color: #3c373b;
-    text-align: center;
-    text-transform: uppercase;
+.calendar-frame::after {
+    content: '';
+    position: absolute;
     width: 100%;
+    height: 30px;
+    background: white;
+    bottom: 0;
+    left: 0;
+    border-radius: 0 0 2px 2px;
 }
 
-.guest-description {
-    font-size: 20px;
-    font-weight: 250;
-    line-height: 1.5;
-    color: #3c373b;
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    margin-bottom: 8px;
+    height: calc(100% - 28px);
+}
+
+.calendar-day {
+    font-family: 'Raleway', sans-serif;
+    font-size: 12px;
+    color: #000000;
+    font-weight: 600;
     text-align: center;
-    margin-bottom: 30px;
-    max-width: 500px;
-    opacity: 0.8;
+    padding: 3px 0;
 }
 
-.guest-date {
-    font-size: 64px;
-    font-weight: 300;
-    color: #3c373b;
+.calendar-date-cell {
+    font-family: 'Raleway', sans-serif;
+    font-size: 13px;
+    color: #000000;
     text-align: center;
-    margin-bottom: 50px;
-    letter-spacing: 8px;
-    line-height: 1.2;
-    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    padding: 5px 0;
+    border-radius: 4px;
+    cursor: default;
 }
 
-.guest-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 160px;
-    height: 160px;
-    background-color: #ffffff;
-    border: 2px solid #3c373b;
-    border-radius: 50%;
-    color: #3c373b;
-    font-family: 'Didot', 'Bodoni', 'Georgia', 'Times New Roman', serif;
-    font-size: 12px !important;
-    font-weight: 400;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    text-decoration: none;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    line-height: 1.2;
-    padding: 0;
-    box-sizing: border-box;
-    margin: 0 auto;
+.calendar-date-cell.empty {
+    color: transparent;
 }
 
-.guest-button:hover,
-.guest-button:active {
-    background-color: #3c373b;
-    color: #ffffff;
-    transform: scale(1.05);
-    box-shadow: 0 8px 30px rgba(60, 55, 59, 0.3);
+.calendar-date-cell.other-month {
+    color: #ccc;
 }
 
-.guest-button span {
-    display: block;
-    white-space: nowrap;
-    max-width: 120px;
+.calendar-date-cell.wedding-day {
+    background-color: #8B0000;
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 2px 5px rgba(139, 0, 0, 0.3);
 }
 
-/* Адаптация для мобильных устройств */
-@media (max-width: 600px) {
-    .guest-section {
-        padding: 50px 15px 70px;
-    }
-    
-    .guest-title {
-        font-size: 36px;
-        letter-spacing: 4px;
-        margin-bottom: 25px;
-    }
-    
-    .guest-description {
-        font-size: 18px;
-        margin-bottom: 25px;
-        padding: 0 10px;
-    }
-    
-    .guest-date {
-        font-size: 52px;
-        letter-spacing: 6px;
-        margin-bottom: 40px;
-    }
-    
-    .guest-button {
-        width: 150px;
-        height: 150px;
-        font-size: 17px;
-        letter-spacing: 2.5px;
-    }
+.calendar-date-cell.current-day {
+    border: 2px solid #8B0000;
 }
 
-@media (max-width: 400px) {
-    .guest-section {
-        padding: 40px 12px 60px;
-    }
-    
-    .guest-title {
-        font-size: 30px;
-        letter-spacing: 3px;
-        margin-bottom: 20px;
-    }
-    
-    .guest-description {
-        font-size: 16px;
-        margin-bottom: 20px;
-    }
-    
-    .guest-date {
-        font-size: 42px;
-        letter-spacing: 4px;
-        margin-bottom: 35px;
-    }
-    
-    .guest-button {
-        width: 140px;
-        height: 140px;
-        font-size: 16px;
-        letter-spacing: 2px;
-    }
-}
-
-@media (max-width: 320px) {
-    .guest-date {
-        font-size: 36px;
-        letter-spacing: 3px;
-    }
-    
-    .guest-button {
-        width: 130px;
-        height: 130px;
-        font-size: 15px;
-    }
-}
-
-
-/* Стили для модального окна анкеты */
-.guest-modal {
-    display: none;
-    position: fixed;
-    top: 0;
+.calendar-month-label {
+    position: absolute;
+    bottom: 10px;
     left: 0;
     width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    z-index: 2000;
-    overflow-y: auto;
-    backdrop-filter: blur(5px);
+    text-align: center;
+    font-family: 'Raleway', sans-serif;
+    font-size: 15px;
+    color: #000000;
+    z-index: 11;
+    padding: 0 10px;
 }
 
-.guest-modal.show {
+@keyframes gentleSwingCalendar {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-3deg); }
+    75% { transform: rotate(3deg); }
+}
+
+/* Текст после календаря */
+.after-calendar-text {
+    font-family: 'Raleway', sans-serif;
+    font-size: 20px;
+    color: #000000;
+    text-align: center;
+    margin: 40px 20px;
+    line-height: 1.6;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+    padding: 0;
+}
+
+/* Адрес мероприятия */
+.address-text {
+    font-family: 'Raleway', sans-serif;
+    font-size: 20px;
+    color: #000000;
+    text-align: center;
+    margin: 20px 20px 30px;
+    line-height: 1.6;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+/* Фото места проведения */
+.location-photo {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
     display: block;
+    margin: 20px auto 30px;
+    border-radius: 10px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    border: 2px solid rgba(139, 0, 0, 0.2);
 }
 
-.guest-modal-content {
-    position: relative;
-    background-color: #ffffff;
-    margin: 30px auto;
-    padding: 0;
-    width: 90%;
-    max-width: 600px;
-    border-radius: 30px;
-    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
-    animation: guestModalSlideIn 0.4s ease;
+/* Кнопка "Карта" - ЧЕРНАЯ РАМКА */
+.map-button-section {
+    text-align: center;
+    margin: 30px 20px;
 }
 
-@keyframes guestModalSlideIn {
-    from {
-        transform: translateY(-50px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-.guest-modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 25px 30px;
-    border-bottom: 1px solid #e0e0e0;
-}
-
-.guest-modal-title {
-    font-family: 'Didot', 'Bodoni', 'Georgia', 'Times New Roman', serif;
-    font-size: 28px;
-    font-weight: 300;
-    letter-spacing: 4px;
-    color: #3c373b;
-    margin: 0;
-}
-
-.guest-modal-close {
-    background: none;
-    border: none;
-    font-size: 40px;
-    line-height: 1;
-    color: #3c373b;
+.map-button {
+    display: inline-block;
+    padding: 12px 30px;
+    background: transparent;
+    color: #000000;
+    text-decoration: none;
+    border-radius: 8px;
+    font-family: 'Raleway', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    transition: all 0.3s;
+    box-shadow: none;
     cursor: pointer;
-    padding: 0;
-    width: 40px;
-    height: 40px;
+    border: 2px solid #000000;
+}
+
+.map-button:hover {
+    background: rgba(0, 0, 0, 0.1);
+    transform: scale(1.05);
+}
+
+/* Заглушка для карты */
+.map-placeholder {
+    width: 100%;
+    height: 300px;
+    background: #f0f0f0;
+    border: 2px solid #8B0000;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s ease;
+    margin: 20px auto;
+    color: #8B0000;
+    font-family: 'Raleway', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    text-align: center;
+    padding: 20px;
 }
 
-.guest-modal-close:hover {
-    transform: scale(1.2);
-    color: #000;
+/* ДРЕСС-КОД */
+.dresscode-section {
+    margin: 60px 20px;
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    position: relative;
 }
 
-/* Стили для формы */
-.guest-form {
-    padding: 30px;
+.dresscode-text {
+    font-family: 'Raleway', sans-serif;
+    font-size: 20px;
+    color: #000000;
+    text-align: center;
+    line-height: 1.6;
+    text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.8);
+    margin-bottom: 40px;
+}
+
+/* Подзаголовки для дресс-кода */
+.dresscode-subtitle {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    color: #8B0000;
+    text-align: center;
+    margin: 40px 0 20px;
+    font-weight: 600;
+    text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+/* Фото для дресс-кода - БОЛЬШИЕ */
+.dresscode-photo {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    display: block;
+    margin: 0 auto 40px;
+    border-radius: 10px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    border: 2px solid rgba(139, 0, 0, 0.2);
+}
+
+/* ПРОГРАММА ДНЯ */
+.program-section {
+    margin: 60px 20px;
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.program-item {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px dashed rgba(139, 0, 0, 0.3);
+    position: relative;
+}
+
+.program-time-event {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+
+.program-event {
+    font-family: 'Raleway', sans-serif;
+    font-size: 20px;
+    color: #000000;
+    font-weight: 500;
+    text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.8);
+}
+
+.program-time {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    color: #8B0000;
+    font-weight: 600;
+    text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.8);
+}
+
+.program-note {
+    font-family: 'Raleway', sans-serif;
+    font-size: 16px;
+    color: #5a3e1b;
+    font-style: italic;
+    line-height: 1.5;
+    text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.8);
+    padding-left: 10px;
+    border-left: 2px solid rgba(139, 0, 0, 0.3);
+    margin-top: 5px;
+}
+
+/* ПОЖЕЛАНИЯ */
+.wishes-section {
+    margin: 60px 20px;
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+}
+
+.wishes-text {
+    font-family: 'Raleway', sans-serif;
+    font-size: 20px;
+    color: #000000;
+    text-align: center;
+    line-height: 1.6;
+    text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.8);
+    margin-bottom: 30px;
+}
+
+/* Специальный стиль для текста 14+ */
+.wishes-age-text {
+    font-family: 'Raleway', sans-serif !important;
+    font-size: 20px !important;
+    color: #000000 !important;
+    text-align: center !important;
+    line-height: 1.6 !important;
+    text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.8) !important;
+    margin-bottom: 20px !important;
+}
+
+/* Телефонный номер центрированный */
+.phone-text-centered {
+    font-family: 'Raleway', sans-serif;
+    font-size: 22px;
+    color: #8B0000;
+    font-weight: 600;
+    text-align: center;
+    text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.8);
+    margin-top: 10px;
+    margin-bottom: 30px;
+}
+
+.wishes-list {
+    font-family: 'Raleway', sans-serif;
+    font-size: 18px;
+    color: #000000;
+    line-height: 1.6;
+    text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.8);
+    padding-left: 20px;
+    margin: 0 20px;
+}
+
+.wishes-list li {
+    margin-bottom: 15px;
+}
+
+/* Кнопка Telegram - такой же стиль как у кнопки "Карта" */
+.telegram-button {
+    display: inline-block;
+    padding: 12px 30px;
+    background: transparent;
+    color: #000000;
+    text-decoration: none;
+    border-radius: 8px;
+    font-family: 'Raleway', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    transition: all 0.3s;
+    box-shadow: none;
+    cursor: pointer;
+    border: 2px solid #000000;
+    margin-top: 20px;
+}
+
+.telegram-button:hover {
+    background: rgba(0, 0, 0, 0.1);
+    transform: scale(1.05);
+}
+
+.telegram-button i {
+    margin-right: 8px;
+}
+
+/* АНКЕТА ГОСТЯ - ПРОСТАЯ ВЕРСИЯ */
+.form-section {
+    margin: 60px 20px;
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
 }
 
 .form-group {
@@ -1237,646 +861,697 @@ html, body {
 
 .form-label {
     display: block;
-    font-family: 'Didot', 'Bodoni', 'Georgia', 'Times New Roman', serif;
+    font-family: 'Raleway', sans-serif;
     font-size: 18px;
-    font-weight: 300;
-    color: #3c373b;
-    margin-bottom: 8px;
-    letter-spacing: 1px;
+    color: #000000;
+    margin-bottom: 10px;
+    font-weight: 500;
+    text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.8);
 }
 
-.form-input,
-.form-textarea {
+.form-input, .form-select {
     width: 100%;
     padding: 15px 18px;
-    font-family: 'Didot', 'Bodoni', 'Georgia', 'Times New Roman', serif;
-    font-size: 16px;
-    color: #3c373b;
-    border: 1px solid #d0d0d0;
-    border-radius: 15px;
-    box-sizing: border-box;
-    transition: all 0.3s ease;
-    background-color: #f9f9f9;
+    font-family: 'Raleway', sans-serif;
+    font-size: 18px;
+    color: #000000;
+    border: 2px solid #000000;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.7);
+    transition: all 0.3s;
 }
 
-.form-input:focus,
-.form-textarea:focus {
+.form-input:focus, .form-select:focus {
     outline: none;
-    border-color: #3c373b;
-    background-color: #ffffff;
-    box-shadow: 0 0 0 3px rgba(60, 55, 59, 0.1);
+    border-color: #8B0000;
+    background: rgba(255, 255, 255, 0.9);
 }
 
-.form-input::placeholder,
-.form-textarea::placeholder {
-    color: #aaa;
-    font-weight: 200;
-    font-size: 15px;
-}
-
-.form-textarea {
-    resize: vertical;
-    min-height: 100px;
-}
-
-/* Стили для радио-кнопок */
-.radio-group {
-    display: flex;
-    gap: 30px;
-    flex-wrap: wrap;
-}
-
-.radio-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-family: 'Didot', 'Bodoni', 'Georgia', 'Times New Roman', serif;
-    font-size: 18px;
-    font-weight: 250;
-    color: #3c373b;
-    cursor: pointer;
-}
-
-.radio-label input[type="radio"] {
-    width: 20px;
-    height: 20px;
-    accent-color: #3c373b;
-    cursor: pointer;
-}
-
-/* Кнопки формы */
-.form-actions {
-    display: flex;
-    gap: 15px;
-    margin-top: 35px;
-}
-
-.form-submit,
-.form-cancel {
-    flex: 1;
-    padding: 16px 20px;
-    font-family: 'Didot', 'Bodoni', 'Georgia', 'Times New Roman', serif;
-    font-size: 18px;
-    font-weight: 300;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.form-submit {
-    background-color: #3c373b;
-    color: #ffffff;
-    border: 2px solid #3c373b;
-}
-
-.form-submit:hover {
-    background-color: #ffffff;
-    color: #3c373b;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(60, 55, 59, 0.2);
-}
-
-.form-cancel {
-    background-color: #f0f0f0;
-    color: #3c373b;
-    border: 2px solid #d0d0d0;
-}
-
-.form-cancel:hover {
-    background-color: #e0e0e0;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-}
-
-/* Адаптация для мобильных устройств */
-@media (max-width: 600px) {
-    .guest-modal-content {
-        margin: 15px auto;
-        width: 95%;
-    }
-    
-    .guest-modal-header {
-        padding: 20px 25px;
-    }
-    
-    .guest-modal-title {
-        font-size: 24px;
-        letter-spacing: 3px;
-    }
-    
-    .guest-modal-close {
-        font-size: 36px;
-    }
-    
-    .guest-form {
-        padding: 25px;
-    }
-    
-    .form-label {
-        font-size: 16px;
-    }
-    
-    .form-input,
-    .form-textarea {
-        padding: 14px 16px;
-        font-size: 15px;
-    }
-    
-    .radio-label {
-        font-size: 16px;
-    }
-    
-    .form-submit,
-    .form-cancel {
-        padding: 14px 15px;
-        font-size: 16px;
-    }
-}
-
-@media (max-width: 400px) {
-    .guest-modal-title {
-        font-size: 20px;
-        letter-spacing: 2px;
-    }
-    
-    .guest-form {
-        padding: 20px;
-    }
-    
-    .form-group {
-        margin-bottom: 20px;
-    }
-    
-    .radio-group {
-        gap: 20px;
-    }
-    
-    .form-actions {
-        flex-direction: column;
-        gap: 10px;
-    }
-    
-    .form-submit,
-    .form-cancel {
-        width: 100%;
-    }
-}
-
-/* Контейнер для фото-заголовка пожеланий */
-.wishes-title-photo {
-    width: 100%;
-    text-align: center;
-    margin-bottom: 40px; /* Такой же отступ, как был у заголовка */
-}
-
-/* Само фото заголовка */
-.wishes-title-img {
-    max-width: 100%;
-    height: auto;
-    display: inline-block;
-}
-
-/* Контейнер для фото-заголовка тайминга */
-.timing-title-photo {
-    width: 100%;
-    text-align: center;
-    margin-bottom: 50px; /* Такой же отступ, как был у заголовка */
-}
-
-/* Само фото заголовка */
-.timing-title-img {
-    width: 180px; /* Задайте нужную ширину */
-    height: auto;
-    display: block;
-    margin: 0 auto; /* Центрирование */
-}
-
-/* Контейнер для фото-заголовка контактов */
-.contacts-title-photo {
-    width: 100%;
-    text-align: center;
-    margin-bottom: 30px; /* Такой же отступ, как был у заголовка */
-}
-
-/* Само фото заголовка */
-.contacts-title-img {
-    width: 180px; /* Задайте нужную ширину */
-    height: auto;
-    display: block;
-    margin: 0 auto; /* Центрирование */
-
-}
-
-/* Удалите или закомментируйте старый стиль .contacts-title */
-/* .contacts-title {
-    ...
-} */
-
-
-/* Отключаем синее выделение при тапе на всех элементах */
-* {
-    -webkit-tap-highlight-color: transparent !important;
-    -webkit-touch-callout: none !important;
-    -webkit-user-select: none !important;
-    -khtml-user-select: none !important;
-    -moz-user-select: none !important;
-    -ms-user-select: none !important;
-    user-select: none !important;
-}
-
-/* Для кнопок и ссылок отдельно (если нужно разрешить выделение текста где-то еще) */
-button,
-a,
-.contact-button,
-.gift-button,
-.guest-button,
-.location-button,
-.wish-arrow,
-.modal-close,
-.form-submit,
-.form-cancel {
-    -webkit-tap-highlight-color: transparent !important;
-    -webkit-touch-callout: none !important;
-    /* Убираем user-select, чтобы текст можно было выделять при необходимости */
-}
-
-/* Для полей ввода (формы) разрешаем выделение и тап */
-input,
-textarea,
-select,
-option,
-.form-input,
-.form-textarea,
-.radio-label {
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1) !important; /* Светло-серый вместо синего */
-    -webkit-user-select: text !important;
-    -moz-user-select: text !important;
-    -ms-user-select: text !important;
-    user-select: text !important;
-}
-
-/* Стили для чекбоксов */
-.checkbox-group {
+.radio-group, .checkbox-group {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    margin-top: 5px;
+    gap: 8px;
+    margin-top: 8px;
 }
 
-.checkbox-label {
+.radio-label, .checkbox-label {
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-family: 'Didot', 'Bodoni', 'Georgia', 'Times New Roman', serif;
-    font-size: 18px;
-    font-weight: 250;
-    color: #3c373b;
+    font-family: 'Raleway', sans-serif;
+    font-size: 17px;
+    color: #000000;
     cursor: pointer;
+    padding: 5px 0;
+    transition: all 0.3s;
+    text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.8);
 }
 
-.checkbox-label input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    accent-color: #3c373b;
+.radio-label:hover, .checkbox-label:hover {
+    color: #8B0000;
+}
+
+/* ЧЕРНЫЙ ЦВЕТ ДЛЯ РАДИО И ЧЕКБОКСОВ */
+.radio-input, .checkbox-input {
+    margin-right: 10px;
+    width: 18px;
+    height: 18px;
+    accent-color: #000000;
+}
+
+.submit-button {
+    display: block;
+    width: 100%;
+    padding: 15px;
+    font-family: 'Raleway', sans-serif;
+    font-size: 20px;
+    color: #000000;
+    background: transparent;
+    border: 2px solid #000000;
+    border-radius: 8px;
     cursor: pointer;
+    margin-top: 30px;
+    transition: all 0.3s;
+    font-weight: 600;
 }
 
-.form-hint {
-    font-family: 'Didot', 'Bodoni', 'Georgia', 'Times New Roman', serif;
-    font-size: 14px;
-    font-weight: 200;
-    color: #3c373b;
-    opacity: 0.6;
-    margin-top: 8px;
-    font-style: italic;
+.submit-button:hover {
+    background: rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
 }
 
-/* Адаптация для мобильных */
-@media (max-width: 600px) {
-    .checkbox-label {
-        font-size: 16px;
+/* КОНТАКТЫ - ПРОСТОЙ ТЕКСТ */
+.contacts-section {
+    margin: 60px 20px;
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    text-align: center;
+}
+
+.contacts-text {
+    font-family: 'Raleway', sans-serif;
+    font-size: 20px;
+    color: #000000;
+    line-height: 1.6;
+    margin-bottom: 10px;
+    text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.8);
+}
+
+.phone-text {
+    font-family: 'Raleway', sans-serif;
+    font-size: 22px;
+    color: #8B0000;
+    font-weight: 600;
+    text-align: center;
+    text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.8);
+    margin-top: 10px;
+}
+
+/* ФУТЕР С ОБРАТНЫМ ОТСЧЕТОМ - МИНИМАЛИСТИЧНЫЙ */
+.footer-section {
+    margin: 60px 20px 40px;
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    text-align: center;
+}
+
+.countdown-timer {
+    display: flex;
+    justify-content: center;
+    gap: 10px; /* Уменьшаем расстояние между элементами */
+    margin-top: 0px;
+    flex-wrap: nowrap; /* Запрещаем перенос */
+    width: 100%;
+    padding: 0 5px;
+}
+
+.countdown-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 60px;
+}
+
+.countdown-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: #000000;
+    text-align: center;
+}
+
+.countdown-label {
+    font-family: 'Raleway', sans-serif;
+    font-size: 12px;
+    color: #000000;
+    margin-top: 5px;
+    text-transform: uppercase;
+    font-weight: 600;
+    text-shadow: 1px 1px 1px rgba(255, 255, 255, 0.8);
+}
+
+/* =========================================== */
+/* АДАПТАЦИЯ ДЛЯ РАВНОМЕРНОГО ОТОБРАЖЕНИЯ НА ВСЕХ УСТРОЙСТВАХ */
+/* =========================================== */
+
+/* Базовые размеры для декоративных элементов */
+.decor-element {
+    /* Единый подход для всех устройств */
+}
+
+/* Для очень маленьких экранов (до 360px) */
+@media (max-width: 360px) {
+    .wedding-date {
+        font-size: 54px !important;
+        right: 20px !important;
+        top: 25px;
     }
     
-    .checkbox-label input[type="checkbox"] {
-        width: 18px;
-        height: 18px;
-    }
-}
-
-@media (max-width: 400px) {
-    .checkbox-group {
-        gap: 12px;
+    .bride-photo-container, .groom-photo-container {
+        width: 50% !important;
+        max-width: 150px !important;
     }
     
-    .checkbox-label {
-        font-size: 15px;
+    .decoration-photo-container {
+        width: 140px !important;
+        height: 140px !important;
+        bottom: 140px !important;
+        left: 10px !important;
+    }
+    
+    /* Декоративные элементы - одинаковые пропорции */
+    .music-decor {
+        width: 100px !important;
+        height: 100px !important;
+        right: 0% !important;
+    }
+    
+    .calendar-decor {
+        width: 100px !important;
+        height: 100px !important;
+        left: 10px !important;
+        top: -40px !important;
+    }
+    
+    .dresscode-decor {
+        width: 100px !important;
+        height: 100px !important;
+        right: 15px !important;
+        top: -30px !important;
+    }
+    
+    .welcome-decor {
+        width: 90px !important;
+        height: 90px !important;
+        right: 15px !important;
+        top: -35px !important;
+    }
+    
+    .banket-decor {
+        width: 100px !important;
+        height: 100px !important;
+        left: 15px !important;
+        top: -40px !important;
+    }
+    
+    .finish-decor {
+        width: 95px !important;
+        height: 95px !important;
+        right: 15px !important;
+        bottom: -40px !important;
+    }
+    
+    .wishes-decor, .second-wishes-decor {
+        width: 120px !important;
+        height: 120px !important;
+        margin: 20px auto !important;
+    }
+    
+    .signature-decor {
+        width: 110px !important;
+        height: 110px !important;
+        margin: 0 auto 20px !important;
+    }
+}
+
+/* iPhone 12 Pro (390px) и подобные - ОПТИМАЛЬНЫЕ РАЗМЕРЫ */
+@media (min-width: 361px) and (max-width: 420px) {
+    .wedding-date {
+        font-size: 58px;
+        right: 25px !important;
+        top: 25px;
+    }
+    
+    .bride-photo-container, .groom-photo-container {
+        width: 55% !important;
+        max-width: 180px !important;
+    }
+    
+    /* Объект 11.png в начале */
+    .decoration-photo-container {
+        width: 160px !important;
+        height: 160px !important;
+        bottom: 130px !important;
+        left: 0px !important;
+    }
+    
+    /* Объект 12.png у плеера */
+    .music-decor {
+        width: 140px !important;
+        height: 140px !important;
+        right: -7% !important;
+        top: -50% !important;
+    }
+    
+    /* Объект 13.png у календаря */
+    .calendar-decor {
+        width: 120px !important;
+        height: 120px !important;
+        left: 5px !important;
+        top: -45px !important;
+    }
+    
+    /* Объект 11.png у "дресс-код" */
+    .dresscode-decor {
+        width: 120px !important;
+        height: 120px !important;
+        right: -30px !important;
+        top: -35px !important;
+    }
+    
+    /* Объект 14.png у "Welcome" */
+    .welcome-decor {
+        width: 90px !important;
+        height: 90px !important;
+        right: 25px !important;
+        top: -40px !important;
+    }
+    
+    /* Объект 12.png у "банкет" */
+    .banket-decor {
+        width: 120px !important;
+        height: 120px !important;
+        left: 40px !important;
+        top: -45px !important;
+    }
+    
+    /* Объект 13.png у "завершение праздника" */
+    .finish-decor {
+        width: 115px !important;
+        height: 115px !important;
+        right: -10px !important;
+        bottom: -45px !important;
+    }
+    
+    /* Объект 15.png в пожеланиях */
+    .wishes-decor, .second-wishes-decor {
+        width: 140px !important;
+        height: 140px !important;
+        margin: 20px auto !important;
+    }
+    
+    /* Объект 16.png перед подписью */
+    .signature-decor {
+        width: 150px !important;
+        height: 150px !important;
+        margin: 0 auto 20px !important;
+    }
+}
+
+/* iPhone 14 Pro Max и большие телефоны (421px - 480px) */
+@media (min-width: 421px) and (max-width: 480px) {
+    .wedding-date {
+        font-size: 62px;
+        right: 30px !important;
+        top: 25px;
+    }
+    
+    .bride-photo-container, .groom-photo-container {
+        width: 55% !important;
+        max-width: 200px !important;
+    }
+    
+    .decoration-photo-container {
+        width: 180px !important;
+        height: 180px !important;
+        bottom: 120px !important;
+        left: 5px !important;
+    }
+    
+    /* Декоративные элементы - такие же как для iPhone 12 Pro */
+    .music-decor {
+        width: 150px !important;
+        height: 150px !important;
+        right: 0% !important;
+        top: -42px;
+    }
+    
+    .calendar-decor {
+        width: 130px !important;
+        height: 130px !important;
+        left: 15px !important;
+        top: -50px !important;
+    }
+    
+    .dresscode-decor {
+        width: 130px !important;
+        height: 130px !important;
+        right: -25px !important;
+        top: -40px !important;
+    }
+    
+    .welcome-decor {
+        width: 100px !important;
+        height: 100px !important;
+        right: 25px !important;
+        top: -45px !important;
+    }
+    
+    .banket-decor {
+        width: 130px !important;
+        height: 130px !important;
+        left: 40px !important;
+        top: -50px !important;
+    }
+    
+    .finish-decor {
+        width: 125px !important;
+        height: 125px !important;
+        right: 15px !important;
+        bottom: -50px !important;
+        top: 45px;
+    }
+    
+    .wishes-decor, .second-wishes-decor {
+        width: 150px !important;
+        height: 150px !important;
+    }
+    
+    .signature-decor {
+        width: 140px !important;
+        height: 140px !important;
+    }
+}
+
+/* Для устройств с большей высотой экрана */
+@media (min-height: 700px) and (max-width: 480px) {
+    .decoration-photo-container {
+        bottom: 140px !important;
+    }
+    
+    .bride-photo-container, .groom-photo-container {
+        max-width: 220px !important;
+    }
+}
+
+/* Для планшетов и горизонтальной ориентации (от 481px) */
+@media (min-width: 481px) {
+    .wedding-date {
+        font-size: 74px;
+        right: 40px !important;
+        top: 30px;
+    }
+    
+    .bride-photo-container, .groom-photo-container {
+        max-width: 250px !important;
+        width: 45% !important;
+    }
+    
+    .decoration-photo-container {
+        width: 200px !important;
+        height: 200px !important;
+        bottom: 120px !important;
+        left: 25px !important;
+    }
+    
+    /* Декоративные элементы - базовые размеры (как указаны выше) */
+    .music-decor {
+        width: 140px !important;
+        height: 140px !important;
+        right: 10% !important;
+    }
+    
+    .calendar-decor {
+        width: 140px !important;
+        height: 140px !important;
+        left: 8% !important;
+        top: -50px !important;
+    }
+    
+    .dresscode-decor {
+        width: 140px !important;
+        height: 140px !important;
+        right: 10% !important;
+        top: -40px !important;
+    }
+    
+    .welcome-decor {
+        width: 130px !important;
+        height: 130px !important;
+        right: 8% !important;
+        top: -45px !important;
+    }
+    
+    .banket-decor {
+        width: 140px !important;
+        height: 140px !important;
+        left: 10% !important;
+        top: -50px !important;
+    }
+    
+    .finish-decor {
+        width: 135px !important;
+        height: 135px !important;
+        right: 10% !important;
+        bottom: -50px !important;
+    }
+    
+    .wishes-decor, .second-wishes-decor {
+        width: 160px !important;
+        height: 160px !important;
+    }
+    
+    .signature-decor {
+        width: 150px !important;
+        height: 150px !important;
+    }
+}
+
+/* Для очень больших экранов (от 768px) */
+@media (min-width: 768px) {
+    .bride-photo-container, .groom-photo-container {
+        max-width: 280px !important;
+        width: 35% !important;
+    }
+    
+    .decoration-photo-container {
+        width: 220px !important;
+        height: 220px !important;
+    }
+    
+    /* Декоративные элементы чуть больше для больших экранов */
+    .decor-element {
+        transform: scale(1.1);
+    }
+}
+
+/* Базовая адаптация остального контента */
+@media (max-width: 480px) {
+    .signature-text {
+        font-size: 18px !important;
+        margin: 20px 0 40px !important;
+        top: 60px;
+    }
+    
+    .typing-text {
+        font-size: 22px !important;
+    }
+    
+    .handwritten-title, .main-title {
+        font-size: 38px !important;
+    }
+    
+    .play-button {
+        width: 60px !important;
+        height: 60px !important;
+        font-size: 24px !important;
+    }
+    
+    .circle-text {
+        width: 100px !important;
+        height: 100px !important;
+        font-size: 10px !important;
+    }
+    
+    .invitation-text {
+        font-size: 20px !important;
+    }
+    
+    .calendar-frame {
+        width: 280px !important;
+        height: 280px !important;
+        padding: 15px 15px 38px 15px !important;
+    }
+    
+    .calendar-date-cell {
+        font-size: 12px !important;
+        padding: 4px 0 !important;
+    }
+    
+    .calendar-day {
+        font-size: 11px !important;
+    }
+    
+    .calendar-month-label {
+        font-size: 14px !important;
+        bottom: 8px !important;
+    }
+    
+    .after-calendar-text {
+        font-size: 18px !important;
+    }
+    
+    .location-photo, .dresscode-photo {
+        max-width: 350px !important;
+    }
+    
+    .dresscode-subtitle {
+        font-size: 24px !important;
+    }
+    
+    .dresscode-text {
+        font-size: 18px !important;
+    }
+    
+    .program-event, .program-time {
+        font-size: 18px !important;
+    }
+    
+    .program-note {
+        font-size: 15px !important;
+    }
+    
+    .wishes-text, .wishes-age-text {
+        font-size: 18px !important;
+    }
+    
+    .phone-text-centered {
+        font-size: 20px !important;
+    }
+    
+    .wishes-list {
+        font-size: 16px !important;
+    }
+    
+    .telegram-button {
+        font-size: 16px !important;
+        padding: 10px 20px !important;
+    }
+    
+    .countdown-number {
+        font-size: 24px !important;
+    }
+    
+    .countdown-label {
+        font-size: 11px !important;
+    }
+    
+    .photo-caption {
+        font-size: 14px !important;
+        bottom: 10px !important;
     }
 }
 
 
 
-/* ========== ПЛАВНЫЕ АНИМАЦИИ ПРИ СКРОЛЛЕ ========== */
 
-/* Белый фон для всего сайта */
-html, body {
-    background-color: white !important;
+.footer-bottom-image {
+    width: 102%;
+    height: auto;
+    display: block;
+    object-fit: cover;
+    max-height: 400px; /* Ограничьте высоту по необходимости */
 }
 
-.gallery {
-    background-color: white;
+
+/* Убираем нижние отступы у content */
+.content {
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
 }
 
-/* Скрываем элементы до появления при скролле */
-.photo-container,
-.location-section,
-.timing-section,
-.wishes-section,
-.contacts-section,
-.guest-section {
-    opacity: 0;
-    transform: translateY(40px);
-    transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1), 
-                transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    will-change: opacity, transform;
+/* Убираем отступы у последней секции */
+.footer-section {
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
 }
 
-/* Класс для появления при скролле */
-.photo-container.visible,
-.location-section.visible,
-.timing-section.visible,
-.wishes-section.visible,
-.contacts-section.visible,
-.guest-section.visible {
-    opacity: 1;
-    transform: translateY(0);
+/* Прижимаем изображение кверху */
+.footer-image-container {
+    margin-top: -5px !important; /* Подберите значение */
+    padding-top: 0 !important;
+    position: relative;
+    top: -1px;
 }
 
-/* Плавное появление с разными задержками */
-.photo-container.visible:nth-child(1) { transition-delay: 0.1s; }
-.photo-container.visible:nth-child(2) { transition-delay: 0.2s; }
-.photo-container.visible:nth-child(3) { transition-delay: 0.3s; }
-.location-section.visible { transition-delay: 0.1s; }
-.timing-section.visible { transition-delay: 0.1s; }
-.photo-container.visible:nth-child(4) { transition-delay: 0.1s; }
-.photo-container.visible:nth-child(5) { transition-delay: 0.1s; }
-.wishes-section.visible { transition-delay: 0.1s; }
-.contacts-section.visible { transition-delay: 0.1s; }
-.guest-section.visible { transition-delay: 0.1s; }
-.photo-container.visible:nth-child(6) { transition-delay: 0.1s; }
-
-/* Пульсация таймера */
-.timer-overlay {
-    animation: gentlePulse 2s infinite ease-in-out;
+.footer-image-container img {
+    display: block;
+    margin: 0;
+    padding: 0;
 }
 
-@keyframes gentlePulse {
-    0%, 100% { opacity: 0.7; }
-    50% { opacity: 0.9; }
+
+/* Добавьте в конец файла styles.css */
+
+/* Уведомления для формы */
+.form-notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 15px 25px;
+    border-radius: 8px;
+    font-family: 'Raleway', sans-serif;
+    font-size: 16px;
+    text-align: center;
+    z-index: 1000;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    animation: slideDown 0.3s ease;
+    max-width: 90%;
+    width: auto;
 }
 
-/* Анимация цифр таймера при загрузке */
-.time-unit {
-    animation: fadeScale 0.5s ease-out;
+.form-notification.success {
+    background-color: #4CAF50;
+    color: white;
+    border: 2px solid #45a049;
 }
 
-@keyframes fadeScale {
+.form-notification.error {
+    background-color: #f44336;
+    color: white;
+    border: 2px solid #d32f2f;
+}
+
+@keyframes slideDown {
     from {
+        top: -100px;
         opacity: 0;
-        transform: scale(0.8);
     }
     to {
-        opacity: 1;
-        transform: scale(1);
-    }
-}
-
-/* Эффекты при наведении на фото */
-.photo {
-    transition: transform 0.5s ease, opacity 0.5s ease;
-}
-
-.photo:hover {
-    transform: scale(1.02);
-    opacity: 0.95;
-}
-
-/* Анимация для всех кнопок */
-.location-button,
-.gift-button,
-.contact-button,
-.guest-button,
-.wish-arrow,
-.modal-close,
-.guest-modal-close,
-.form-submit,
-.form-cancel {
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.location-button:hover,
-.gift-button:hover,
-.contact-button:hover,
-.guest-button:hover {
-    transform: translateX(-50%) scale(1.08) !important;
-    box-shadow: 0 10px 30px rgba(60, 55, 59, 0.25);
-}
-
-/* Специально для кнопки "как добраться" */
-.location-button:hover {
-    transform: translateX(-50%) scale(1.08) !important;
-}
-
-/* Анимация для стрелок слайдера */
-.wish-arrow {
-    transition: all 0.3s ease;
-}
-
-.wish-arrow:hover:not(:disabled) {
-    transform: scale(1.3);
-    opacity: 1;
-}
-
-.wish-arrow:active:not(:disabled) {
-    transform: scale(0.95);
-}
-
-/* Анимация смены текста в слайдере */
-.wish-text {
-    transition: opacity 0.4s ease;
-}
-
-/* Анимация для модальных окон */
-.modal-content,
-.guest-modal-content {
-    animation: modalPopIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-@keyframes modalPopIn {
-    0% {
-        transform: translateY(-50px) scale(0.9);
-        opacity: 0;
-    }
-    100% {
-        transform: translateY(0) scale(1);
+        top: 20px;
         opacity: 1;
     }
 }
 
-/* Анимация фона модальных окон */
-.modal,
-.guest-modal {
-    transition: background-color 0.3s ease;
-}
-
-/* Анимация для иконок тайминга */
-.timing-icon {
-    transition: transform 0.4s ease;
-}
-
-.timing-icon:hover {
-    transform: rotate(5deg) scale(1.1);
-}
-
-/* Анимация для элементов списка подарков */
-.gift-item {
-    transition: all 0.3s ease;
-    cursor: default;
-}
-
-.gift-item:hover {
-    padding-left: 10px;
-    color: #5a5256;
-    border-bottom-color: #3c373b;
-}
-
-/* Анимация для контактной информации */
-.contact-info {
-    transition: transform 0.3s ease;
-}
-
-.contact-info:hover {
-    transform: translateX(5px);
-}
-
-.contact-phone {
-    transition: all 0.3s ease;
-    display: inline-block;
-}
-
-.contact-phone:hover {
-    opacity: 1;
-    transform: translateX(3px);
-}
-
-/* Анимация для даты в анкете */
-.guest-date {
-    transition: all 0.3s ease;
-    display: inline-block;
-    animation: softPulse 3s infinite ease-in-out;
-}
-
-@keyframes softPulse {
-    0%, 100% { 
-        text-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-        transform: scale(1);
+/* Для мобильных устройств */
+@media (max-width: 480px) {
+    .form-notification {
+        top: 10px;
+        padding: 12px 20px;
+        font-size: 14px;
     }
-    50% { 
-        text-shadow: 0 5px 15px rgba(60, 55, 59, 0.15);
-        transform: scale(1.02);
-    }
-}
-
-/* Анимация для полей формы */
-.form-input,
-.form-textarea {
-    transition: all 0.3s ease;
-}
-
-.form-input:focus,
-.form-textarea:focus {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(60, 55, 59, 0.15);
-}
-
-/* Анимация для радио-кнопок и чекбоксов */
-.radio-label,
-.checkbox-label {
-    transition: all 0.2s ease;
-}
-
-.radio-label:hover,
-.checkbox-label:hover {
-    opacity: 0.8;
-    transform: translateX(3px);
-}
-
-/* Анимация для кнопок отправки/отмены */
-.form-submit,
-.form-cancel {
-    position: relative;
-    overflow: hidden;
-}
-
-.form-submit::after,
-.form-cancel::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 5px;
-    height: 5px;
-    background: rgba(255, 255, 255, 0.5);
-    opacity: 0;
-    border-radius: 100%;
-    transform: scale(1, 1) translate(-50%);
-    transform-origin: 50% 50%;
-}
-
-.form-submit:active::after,
-.form-cancel:active::after {
-    animation: ripple 0.4s ease-out;
-}
-
-@keyframes ripple {
-    0% {
-        transform: scale(0, 0);
-        opacity: 0.5;
-    }
-    100% {
-        transform: scale(20, 20);
-        opacity: 0;
-    }
-}
-
-/* Анимация появления для фото-заголовков */
-.location-title-img,
-.timing-title-img,
-.wishes-title-img,
-.contacts-title-img {
-    animation: fadeInRotate 0.8s ease-out;
-}
-
-@keyframes fadeInRotate {
-    0% {
-        opacity: 0;
-        transform: rotate(-5deg) scale(0.9);
-    }
-    100% {
-        opacity: 1;
-        transform: rotate(0) scale(1);
-    }
-}
-
-/* Плавное появление модальных окон при открытии */
-.modal.show,
-.guest-modal.show {
-    animation: fadeBgIn 0.3s ease;
-}
-
-@keyframes fadeBgIn {
-    from { background-color: rgba(0, 0, 0, 0); }
-    to { background-color: rgba(0, 0, 0, 0.7); }
 }
