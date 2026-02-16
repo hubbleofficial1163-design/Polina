@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Сергей & Полина | Свадьба 26.08.2026</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Cormorant+Garamond:wght@400;600&family=Raleway:wght@300;400&family=Marck+Script&family=Bad+Script&family=Caveat:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Верхняя секция -->
+        <section class="top-section">
+            <!-- Дата свадьбы 26.08.26 -->
+            <div class="wedding-date">
+                <div class="wedding-day">26</div>
+                <div class="wedding-month">08</div>
+                <div class="wedding-year">26</div>
+            </div>
+
+            <!-- Фото невесты -->
+            <div class="polaroid-frame bride-photo-container">
+                <img src="2.jpg" alt="Полина" class="bride-photo">
+                <div class="photo-caption bride-caption">Кто будет моим мужем, когда я вырасту?</div>
+            </div>
+
+            <!-- Фото жениха -->
+            <div class="polaroid-frame groom-photo-container">
+                <img src="3.JPG" alt="Сергей" class="groom-photo">
+                <div class="photo-caption groom-caption">Им буду я!</div>
+            </div>
+
+            <!-- Декоративное фото -->
+            <div class="decoration-photo-container">
+                <img src="11.png" alt="Узоры" class="decoration-photo">
+            </div>
+
+            <!-- Текст в центре -->
+            <div class="center-text-container">
+                <div class="typing-text" id="typing-text"></div>
+                <span class="cursor" id="cursor"></span>
+            </div>
+
+            <!-- Стрелка скролла -->
+            <div class="scroll-down" onclick="scrollToContent()">
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        </section>
+
+        <!-- Основной контент -->
+        <div class="content">
+            <h1 class="handwritten-title">Дорогие и любимые!</h1>
+
+            <!-- Музыка -->
+            <section class="music-section">
+                <img src="12.png" alt="Узор" class="decor-element music-decor">
+                <div class="music-player">
+                    <div class="player-wrapper">
+                        <button class="play-button" id="playButton">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <svg class="circle-text" viewBox="0 0 100 100">
+                            <defs><path id="circle" d="M 50, 50 m -37, 0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0"/></defs>
+                            <text font-size="10"><textPath xlink:href="#circle">• Включите музыку • Включите музыку • Включите музыку •</textPath></text>
+                        </svg>
+                    </div>
+                    <audio id="weddingMusic" loop><source src="1.mp3" type="audio/mpeg"></audio>
+                </div>
+            </section>
+
+            <!-- Текст приглашения -->
+            <section class="invitation-text">
+                <p>Узнаете этих детишек?</p>
+                <p>Да-да, это мы — Полина и Сергей. Время пролетело очень быстро, представляете?</p>
+                <p>И вот совсем уже скоро состоится самое важное событие в нашей жизни — мы станем одной семьей.</p>
+            </section>
+
+            <!-- Календарь -->
+            <section class="calendar-section">
+                <img src="13.png" alt="Узор" class="decor-element calendar-decor">
+                <div class="calendar-frame" id="calendarContainer"></div>
+            </section>
+
+            <section class="after-calendar-text">
+                Мы скажем друг другу главные слова и очень хотим, чтобы в этот чудесный день Вы были рядом. Давайте создадим этот теплый и радостный праздник вместе!
+            </section>
+
+            <!-- Место проведения -->
+            <h2 class="main-title">Место проведения</h2>
+            <div class="address-text">
+                База отдыха «Приозерная»,<br>
+                Владимирская область, Киржачский район,<br>
+                деревня Илейкино, улица Приозерная, дом 22.
+            </div>
+            <img src="7.jpg" alt="База отдыха Приозерная" class="location-photo">
+
+            <!-- Кнопка карты -->
+            <section class="map-button-section">
+                <button class="map-button" id="mapButton"><i class="fas fa-map-marker-alt"></i> Карта</button>
+            </section>
+            <div class="map-placeholder" id="mapPlaceholder" style="display: none;">Здесь будет интегрированная карта</div>
+
+            <!-- Дресс-код -->
+            <section class="dresscode-section">
+                <img src="11.png" alt="Узор" class="decor-element dresscode-decor">
+                <h2 class="main-title">Дресс-код</h2>
+                <div class="dresscode-text">Нам будет очень приятно, если вы поддержите нас в создании красивого праздника и будете придерживаться определенных оттенков при выборе своего наряда.</div>
+                <img src="5.jpg" alt="Дресс-код девушки" class="dresscode-photo">
+            </section>
+
+            <!-- Программа дня -->
+            <section class="program-section">
+                <h2 class="main-title">Программа дня</h2>
+                <div class="program-item">
+                    <img src="14.png" alt="Узор" class="decor-element welcome-decor">
+                    <div class="program-time-event">
+                        <div class="program-event">Welcome</div>
+                        <div class="program-time">15:00</div>
+                    </div>
+                    <div class="program-note">
+                        Возьмите с собой отличное настроение! Приветствуются Ваши поздравления, активное участие во всевозможных интерактивах, творческие выступления!
+                    </div>
+                </div>
+                <div class="program-item">
+                    <div class="program-time-event">
+                        <div class="program-event">Свадебная церемония</div>
+                        <div class="program-time">16:00</div>
+                    </div>
+                    <div class="program-note">Будьте свидетелями самого трогательного момента — обмена клятвами верности.</div>
+                </div>
+                <div class="program-item">
+                    <img src="12.png" alt="Узор" class="decor-element banket-decor">
+                    <div class="program-time-event">
+                        <div class="program-event">Банкет</div>
+                        <div class="program-time">17:00</div>
+                    </div>
+                    <div class="program-note">Приготовьтесь к тостам, танцам и веселью — этот вечер мы запомним навсегда.</div>
+                </div>
+                <div class="program-item">
+                    <img src="13.png" alt="Узор" class="decor-element finish-decor">
+                    <div class="program-time-event">
+                        <div class="program-event">Завершение праздника</div>
+                        <div class="program-time">23:00</div>
+                    </div>
+                    <div class="program-note">Уносите с собой самые теплые воспоминания и частичку нашего счастья.</div>
+                </div>
+            </section>
+
+            <!-- Пожелания -->
+            <section class="wishes-section">
+                <h2 class="main-title">Пожелания</h2>
+                
+                <div class="wishes-age-text"><strong>Возьмите с собой отличное настроение!</strong></div>
+                
+                <img src="15.png" alt="Узор" class="wishes-decor">
+                
+                <div class="wishes-text">
+                    Приветствуются Ваши поздравления, активное участие во всевозможных интерактивах, творческие выступления!
+                </div>
+
+                <div class="wishes-text">
+                    Вы можете обратиться к нашему ведущему для воплощения своих идей!
+                </div>
+                
+                <div class="phone-text-centered">Кирилл: +7 (915) 297-77-67</div>
+                
+                <img src="15.png" alt="Узор" class="wishes-decor second-wishes-decor">
+                
+                
+                <div class="wishes-text" style="margin-top: 20px;">
+                    Также мы создали чат в Telegram для всех приглашенных.<br>
+                </div>
+
+                <!-- Кнопка Telegram -->
+                <a href="https://t.me/+Hmm4JefhqYcwNmE6" target="_blank" class="telegram-button" style="display: block; text-align: center; margin: 30px auto 20px;">
+                    <i class="fab fa-telegram"></i> Перейти в Telegram-чат
+                </a>
+            </section>
+
+            <!-- Анкета -->
+            <section class="form-section">
+                <h2 class="main-title">Анкета</h2>
+                <form id="guestForm">
+                    <div class="form-group">
+                        <label class="form-label">Напишите, пожалуйста, Ваши ФИО *</label>
+                        <input type="text" class="form-input" name="fio" required placeholder="Иванова Анна Сергеевна">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Ваш номер телефона *</label>
+                        <input type="tel" class="form-input" name="phone" required placeholder="+7 (999) 123-45-67">
+                    </div>
+                    
+                    <!-- Только 2 варианта -->
+                    <div class="form-group">
+                        <label class="form-label">Сможете ли присутствовать на нашем торжестве? *</label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" class="radio-input" name="attendance" value="yes" required>
+                                Я с удовольствием приду
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" class="radio-input" name="attendance" value="no">
+                                К сожалению, не смогу присутствовать
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Алкоголь -->
+                    <div class="form-group">
+                        <label class="form-label">Какой алкоголь предпочитаете? (можно выбрать несколько)</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label"><input type="checkbox" class="checkbox-input" name="alcohol" value="sparkling"> Игристое</label>
+                            <label class="checkbox-label"><input type="checkbox" class="checkbox-input" name="alcohol" value="white_wine"> Белое вино</label>
+                            <label class="checkbox-label"><input type="checkbox" class="checkbox-input" name="alcohol" value="red_wine"> Красное вино</label>
+                            <label class="checkbox-label"><input type="checkbox" class="checkbox-input" name="alcohol" value="whiskey"> Виски</label>
+                            <label class="checkbox-label"><input type="checkbox" class="checkbox-input" name="alcohol" value="vodka"> Водка</label>
+                            <label class="checkbox-label"><input type="checkbox" class="checkbox-input" name="alcohol" value="no_alcohol"> Не буду пить алкоголь</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Комментарии или пожелания</label>
+                        <textarea class="form-input" name="comments" rows="3" placeholder="Ваши пожелания..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="submit-button">Отправить</button>
+                </form>
+            </section>
+
+            <!-- Контакты -->
+            <section class="contacts-section">
+                <h2 class="main-title">Контакты</h2>
+                <div class="contacts-text">По всем вопросам обращайтесь к нашему организатору:</div>
+                <div class="phone-text">Наталья +7 977 444 9553</div>
+            </section>
+
+            <!-- Футер -->
+            <section class="footer-section">
+                <h2 class="main-title">Осталось...</h2>
+                <div class="countdown-timer" id="countdown">
+                    <div class="countdown-item"><div class="countdown-number" id="days">0</div><div class="countdown-label">дней</div></div>
+                    <div class="countdown-item"><div class="countdown-number" id="hours">0</div><div class="countdown-label">часов</div></div>
+                    <div class="countdown-item"><div class="countdown-number" id="minutes">0</div><div class="countdown-label">минут</div></div>
+                    <div class="countdown-item"><div class="countdown-number" id="seconds">0</div><div class="countdown-label">секунд</div></div>
+                </div>
+                <img src="16.png" alt="Узор" class="signature-decor">
+                <div class="signature-text">С любовью, Сергей и Полина</div>
+            </section>
+        </div>
+    </div>
+
+    <!-- После футера -->
+    <div class="footer-image-container">
+        <img src="footer.jpg" alt="Фоновое изображение" class="footer-bottom-image">
+    </div>
+
+    <!-- Подключается только внешний script.js -->
+    <script src="script.js"></script>
+</body>
+</html>
