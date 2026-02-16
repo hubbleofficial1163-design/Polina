@@ -1502,3 +1502,56 @@ body::before {
     margin: 0;
     padding: 0;
 }
+
+
+/* Добавьте в конец файла styles.css */
+
+/* Уведомления для формы */
+.form-notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 15px 25px;
+    border-radius: 8px;
+    font-family: 'Raleway', sans-serif;
+    font-size: 16px;
+    text-align: center;
+    z-index: 1000;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    animation: slideDown 0.3s ease;
+    max-width: 90%;
+    width: auto;
+}
+
+.form-notification.success {
+    background-color: #4CAF50;
+    color: white;
+    border: 2px solid #45a049;
+}
+
+.form-notification.error {
+    background-color: #f44336;
+    color: white;
+    border: 2px solid #d32f2f;
+}
+
+@keyframes slideDown {
+    from {
+        top: -100px;
+        opacity: 0;
+    }
+    to {
+        top: 20px;
+        opacity: 1;
+    }
+}
+
+/* Для мобильных устройств */
+@media (max-width: 480px) {
+    .form-notification {
+        top: 10px;
+        padding: 12px 20px;
+        font-size: 14px;
+    }
+}
